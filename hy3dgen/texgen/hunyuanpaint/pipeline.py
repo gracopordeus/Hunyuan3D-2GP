@@ -111,11 +111,11 @@ class HunyuanPaintPipeline(StableDiffusionPipeline):
         negative_prompt='watermark, ugly, deformed, noisy, blurry, low contrast',
         *args,
         num_images_per_prompt: Optional[int] = 1,
-        guidance_scale=2.0,
+        guidance_scale=5.0,
         output_type: Optional[str] = "pil",
         width=512,
         height=512,
-        num_inference_steps=28,
+        num_inference_steps=50,
         return_dict=True,
         **cached_condition,
     ):
