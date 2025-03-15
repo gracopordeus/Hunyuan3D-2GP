@@ -115,7 +115,7 @@ class HunyuanPaintPipeline(StableDiffusionPipeline):
         output_type: Optional[str] = "pil",
         width=512,
         height=512,
-        num_inference_steps=50,
+        num_inference_steps=1000,
         return_dict=True,
         **cached_condition,
     ):
