@@ -99,12 +99,12 @@ class Light_Shadow_Remover():
         image = image.convert('RGB')
 
         image = self.pipeline(
-            prompt="3D character",
+            prompt="3D",
             image=image,
             generator=torch.manual_seed(42),
             height=512,
             width=512,
-            num_inference_steps=50,
+            num_inference_steps=1000,
             image_guidance_scale=self.cfg_image,
             guidance_scale=self.cfg_text,
         ).images[0]

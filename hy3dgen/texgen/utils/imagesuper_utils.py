@@ -31,7 +31,7 @@ class Image_Super_Net():
                         'stabilityai/stable-diffusion-x4-upscaler',
                         torch_dtype=torch.float16,
                     ).to(config.device)
-        self.up_pipeline_x4.set_progress_bar_config(disable=True)
+        self.up_pipeline_x4.set_progress_bar_config(disable=False)
 
     def __call__(self, image, prompt=''):
         with torch.no_grad():
