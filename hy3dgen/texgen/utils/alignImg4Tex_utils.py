@@ -61,7 +61,7 @@ class Img2img_Control_Ip_adapter:
             prompt=prompt,
             negative_prompt=negative_prompt,
             image=control_image,
-            ip_adapter_image=ip_adapter_image
+            ip_adapter_image=ip_adapter_image,
             generator=torch.manual_seed(42),
             seed=987987987987987,
             num_inference_steps=num_inference_steps,
