@@ -73,7 +73,7 @@ class Light_Shadow_Remover():
         image = self.pipeline(
             prompt="3D character, indie game",
             image=image,
-            generator=987987987987987,
+            generator=torch.manual_seed(42),
             height=512,
             width=512,
             num_inference_steps=60,
