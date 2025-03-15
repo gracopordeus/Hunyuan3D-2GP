@@ -51,7 +51,7 @@ class Img2img_Control_Ip_adapter:
         negative_prompt,
         height=512,
         width=512,
-        num_inference_steps=60,
+        num_inference_steps=200,
         guidance_scale=8.0,
         controlnet_conditioning_scale=1.0,
         output_type="pil",
@@ -111,7 +111,7 @@ class HesModel:
                  negative_prompt='2D image',
                  seed=42,
                  strength=0.8,
-                 num_inference_steps=60,
+                 num_inference_steps=200,
                  guidance_scale=7.5,
                  controlnet_conditioning_scale=0.5,
                  **kwargs

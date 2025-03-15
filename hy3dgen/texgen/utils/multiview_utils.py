@@ -82,5 +82,5 @@ class Multiview_Diffusion_Net():
         kwargs["normal_imgs"] = normal_image
         kwargs["position_imgs"] = position_image
 
-        mvd_image = self.pipeline(input_image, num_inference_steps=60, **kwargs).images
+        mvd_image = self.pipeline(input_image, num_inference_steps=200, **kwargs).images
         return mvd_image

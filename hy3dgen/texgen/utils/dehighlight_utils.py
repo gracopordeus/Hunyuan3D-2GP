@@ -76,7 +76,7 @@ class Light_Shadow_Remover():
             generator=torch.manual_seed(42),
             height=512,
             width=512,
-            num_inference_steps=60,
+            num_inference_steps=200,
             image_guidance_scale=self.cfg_image,
             guidance_scale=self.cfg_text,
         ).images[0]
