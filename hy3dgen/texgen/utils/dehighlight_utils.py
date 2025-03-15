@@ -32,7 +32,7 @@ from diffusers import StableDiffusionInstructPix2PixPipeline, EulerAncestralDisc
 class Light_Shadow_Remover():
     def __init__(self, config):
         self.device = config.device
-        self.cfg_image = 1.5
+        self.cfg_image = 5
         self.cfg_text = 1.0
 
         pipeline = StableDiffusionInstructPix2PixPipeline.from_pretrained(
@@ -41,7 +41,7 @@ class Light_Shadow_Remover():
             safety_checker=None,
         )
         pipeline.scheduler = EulerAncestralDiscreteScheduler.from_config(pipeline.scheduler.config)
-        pipeline.set_progress_bar_config(disable=True)
+        pipeline.set_progress_bar_config(disable=False)
 
         # self.pipeline = pipeline.to(self.device, torch.float16)
         self.pipeline = pipeline # Needed to avoid displaying the warning
@@ -71,12 +71,12 @@ class Light_Shadow_Remover():
         image = image.convert('RGB')
 
         image = self.pipeline(
-            prompt="",
+            prompt="3D character, indie game",
             image=image,
-            generator=torch.manual_seed(42),
+            generator=987987987987987,
             height=512,
             width=512,
-            num_inference_steps=50,
+            num_inference_steps=60,
             image_guidance_scale=self.cfg_image,
             guidance_scale=self.cfg_text,
         ).images[0]
