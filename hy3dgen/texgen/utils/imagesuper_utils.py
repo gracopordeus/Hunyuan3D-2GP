@@ -29,8 +29,9 @@ class Image_Super_Net():
     def __init__(self, config):
         self.up_pipeline_x4 = StableDiffusionUpscalePipeline.from_pretrained(
                         'stabilityai/stable-diffusion-x4-upscaler',
+                        revision="fp16",
                         torch_dtype=torch.float16,
-                    ).to(config.device)
+                    ).to("cuda") # to(config.device)
         self.up_pipeline_x4.set_progress_bar_config(disable=False)
 
     def __call__(self, image, prompt=''):
