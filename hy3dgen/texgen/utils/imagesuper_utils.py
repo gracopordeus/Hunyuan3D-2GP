@@ -23,39 +23,42 @@
 # by Tencent in accordance with TENCENT HUNYUAN COMMUNITY LICENSE AGREEMENT.
 
 import torch
-from diffusers import FluxControlNetModel, FluxControlNetPipeline
+from diffusers import ControlNetModel, StableDiffusionXLControlNetPipeline
 from PIL import Image
 
 class Image_Super_Net():
     def __init__(self, config):
-        # Carregar modelos Flux ControlNet
-        self.controlnet = FluxControlNetModel.from_pretrained(
-            "jasperai/Flux.1-dev-Controlnet-Upscaler",
-            torch_dtype=torch.bfloat16
+        # Usando ControlNet público para upscaling
+        controlnet_model = "diffusers/controlnet-depth-sdxl-1.0"
+        
+        self.controlnet = ControlNetModel.from_pretrained(
+            controlnet_model,
+            torch_dtype=torch.float16,
+            variant="fp16"
         )
         
-        self.pipe = FluxControlNetPipeline.from_pretrained(
-            "black-forest-labs/FLUX.1-dev",
+        self.pipe = StableDiffusionXLControlNetPipeline.from_pretrained(
+            "stabilityai/stable-diffusion-xl-base-1.0",
             controlnet=self.controlnet,
-            torch_dtype=torch.bfloat16
-        ).to("cuda")  # Use config.device se disponível
+            torch_dtype=torch.float16,
+            variant="fp16"
+        ).to("cuda")
         
         self.pipe.set_progress_bar_config(disable=False)
 
-    def __call__(self, image, prompt='3D game with sharp details'):
-        # Redimensionar a imagem de entrada para 4x
+    def __call__(self, image, prompt=''):
+        # Pré-processamento adaptado para SDXL
         w, h = image.size
-        control_image = image.resize((w * 4, h * 4), Image.Resampling.LANCZOS)
+        control_image = image.resize((w*4, h*4), Image.Resampling.LANCZOS)
         
         with torch.no_grad():
             upscaled_image = self.pipe(
-                prompt=prompt,
-                control_image=control_image,
-                controlnet_conditioning_scale=0.6,
-                num_inference_steps=28,
-                guidance_scale=3.5,
-                height=control_image.height,
-                width=control_image.width
+                prompt=f"high quality, detailed, {prompt}",
+                negative_prompt="blurry, low quality, artifacts",
+                image=control_image,
+                num_inference_steps=30,
+                controlnet_conditioning_scale=0.65,
+                guidance_scale=7.5
             ).images[0]
             
         return upscaled_image
