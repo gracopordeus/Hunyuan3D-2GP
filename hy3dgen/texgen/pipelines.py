@@ -211,6 +211,7 @@ class Hunyuan3DPaintPipeline:
                        zip(selected_camera_azims, selected_camera_elevs)]
         multiviews = self.models['multiview_model'](image_prompt, normal_maps + position_maps, camera_info)
 
+        print('Fazendo resize do multiviews...')
         for i in range(len(multiviews)):
             multiviews[i] = self.models['super_model'](multiviews[i])
             multiviews[i] = multiviews[i].resize(
@@ -221,10 +222,13 @@ class Hunyuan3DPaintPipeline:
                                                  method=self.config.merge_method)
 
         mask_np = (mask.squeeze(-1).cpu().numpy() * 255).astype(np.uint8)
-
+        
+        print('Pintando mesh...')
         texture = self.texture_inpaint(texture, mask_np)
-
+        
+        print('Definindo textura...')
         self.render.set_texture(texture)
+        print('Finalizando o mesh...')
         textured_mesh = self.render.save_mesh()
 
         return textured_mesh
