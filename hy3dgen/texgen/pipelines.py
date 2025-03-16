@@ -50,8 +50,8 @@ class Hunyuan3DTexGenConfig:
         self.candidate_camera_elevs = [0, 0, 0, 0, 90, -90]
         self.candidate_view_weights = [1, 0.1, 0.5, 0.1, 0.05, 0.05]
 
-        self.render_size = 1024
-        self.texture_size = 1024# 2048
+        self.render_size = 2048
+        self.texture_size = 2048
         self.bake_exp = 4
         self.merge_method = 'fast'
 
@@ -214,6 +214,7 @@ class Hunyuan3DPaintPipeline:
         for i in range(len(multiviews)):
             print(f'Fazendo resize do multiviews {i} de {len(multiviews)}...')
             multiviews[i] = self.models['super_model'](multiviews[i])
+            torch.cuda.empty_cache()
             multiviews[i] = multiviews[i].resize(
                 (self.config.render_size, self.config.render_size))
 
