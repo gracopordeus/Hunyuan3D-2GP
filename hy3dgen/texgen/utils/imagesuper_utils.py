@@ -24,7 +24,7 @@
 
 import torch
 from diffusers import StableDiffusionUpscalePipeline
-from PIL import ImageFilter
+#from PIL import ImageFilter
 
 class Image_Super_Net():
     def __init__(self, config):
@@ -40,9 +40,9 @@ class Image_Super_Net():
             upscaled_image = self.up_pipeline_x4(
                 prompt="3D",
                 image=image,
-                num_inference_steps=5,
+                num_inference_steps=20,
             ).images[0]
-            upscaled_image = upscaled_image.filter(ImageFilter.UnsharpMask(radius=2, percent=150, threshold=3))
+            #upscaled_image = upscaled_image.filter(ImageFilter.UnsharpMask(radius=2, percent=150, threshold=3))
 
         return upscaled_image
 # import codecs
