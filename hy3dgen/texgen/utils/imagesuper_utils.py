@@ -23,6 +23,7 @@
 # by Tencent in accordance with TENCENT HUNYUAN COMMUNITY LICENSE AGREEMENT.
 
 # Caminho do arquivo (altere conforme o resultado do comando acima)
+import codecs
 print('Finding /usr/local/lib/python3.10/dist-packages/basicsr/data/degradations.py to update torchvision.transforms.functional_tensor location...')
 file_path = "/usr/local/lib/python3.10/dist-packages/basicsr/data/degradations.py"
 # Lê o conteúdo do arquivo
