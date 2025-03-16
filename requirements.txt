@@ -25,6 +25,10 @@ xatlas
 #kornia
 #facexlib
 
+# HD texture:
+basicsr
+realesrgan
+
 # Training
 accelerate
 #pytorch_lightning
