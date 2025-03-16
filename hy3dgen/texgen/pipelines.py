@@ -212,9 +212,9 @@ class Hunyuan3DPaintPipeline:
                        zip(selected_camera_azims, selected_camera_elevs)]
         multiviews = self.models['multiview_model'](image_prompt, normal_maps + position_maps, camera_info)
         
-        for i in tqdm(range(len(multiviews)), desc="Processando multiviews"):
-            #print(f'Fazendo resize do multiviews {i+1} de {len(multiviews)}...')
+        for i in tqdm(range(len(multiviews)), desc=f"{i+1}/{len(multiviews)}"):
             multiviews[i] = self.models['super_model'](multiviews[i])
+            torch.cuda.empty_cache()
             multiviews[i] = multiviews[i].resize(
                 (self.config.render_size, self.config.render_size))
 
@@ -227,9 +227,7 @@ class Hunyuan3DPaintPipeline:
         print('Pintando mesh...')
         texture = self.texture_inpaint(texture, mask_np)
         
-        print('Definindo textura...')
         self.render.set_texture(texture)
-        print('Finalizando o mesh...')
         textured_mesh = self.render.save_mesh()
 
         return textured_mesh
