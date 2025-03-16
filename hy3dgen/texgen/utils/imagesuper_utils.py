@@ -31,7 +31,7 @@ class Image_Super_Net():
                         'stabilityai/stable-diffusion-x4-upscaler',
                         revision="fp16",
                         torch_dtype=torch.float16,
-                    ).to(config.device) # to(config.device)
+                    ).to("cuda") # to(config.device)
         self.up_pipeline_x4.set_progress_bar_config(disable=False)
 
     def __call__(self, image, prompt=''):
@@ -39,7 +39,7 @@ class Image_Super_Net():
             upscaled_image = self.up_pipeline_x4(
                 prompt=[prompt],
                 image=image,
-                num_inference_steps=5,
+                num_inference_steps=30,
             ).images[0]
 
         return upscaled_image
