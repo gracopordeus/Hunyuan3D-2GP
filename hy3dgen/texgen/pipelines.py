@@ -29,6 +29,7 @@ import os
 import numpy as np
 import torch
 from PIL import Image
+from tqdm import tqdm
 
 from .differentiable_renderer.mesh_render import MeshRender
 from .utils.dehighlight_utils import Light_Shadow_Remover
@@ -211,10 +212,9 @@ class Hunyuan3DPaintPipeline:
                        zip(selected_camera_azims, selected_camera_elevs)]
         multiviews = self.models['multiview_model'](image_prompt, normal_maps + position_maps, camera_info)
         
-        for i in range(len(multiviews)):
-            print(f'Fazendo resize do multiviews {i+1} de {len(multiviews)}...')
+        for i in tqdm(range(len(multiviews)), desc="Processando multiviews"):
+            #print(f'Fazendo resize do multiviews {i+1} de {len(multiviews)}...')
             multiviews[i] = self.models['super_model'](multiviews[i])
-            #torch.cuda.empty_cache()
             multiviews[i] = multiviews[i].resize(
                 (self.config.render_size, self.config.render_size))
 
