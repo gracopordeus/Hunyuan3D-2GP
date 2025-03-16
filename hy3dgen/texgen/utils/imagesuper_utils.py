@@ -22,67 +22,90 @@
 # fine-tuning enabling code and other elements of the foregoing made publicly available
 # by Tencent in accordance with TENCENT HUNYUAN COMMUNITY LICENSE AGREEMENT.
 
+# Caminho do arquivo (altere conforme o resultado do comando acima)
+print('Finding /usr/local/lib/python3.10/dist-packages/basicsr/data/degradations.py to update torchvision.transforms.functional_tensor location...')
+file_path = "/usr/local/lib/python3.10/dist-packages/basicsr/data/degradations.py"
+# Lê o conteúdo do arquivo
+with codecs.open(file_path, "r", "utf-8") as f:
+    content = f.read()
+
+# Substitui a linha problemática
+new_content = content.replace(
+    "from torchvision.transforms.functional_tensor import rgb_to_grayscale",
+    "from torchvision.transforms.functional import rgb_to_grayscale"
+)
+
+# Salva as alterações
+with codecs.open(file_path, "w", "utf-8") as f:
+    f.write(new_content)
+print("Successfully!")
+
 import torch
+from basicsr.archs.rrdbnet_arch import RRDBNet
+from realesrgan import RealESRGANer
 from diffusers import StableDiffusionUpscalePipeline
 
+from PIL import Image
+import numpy as np
+    
 class Image_Super_Net():
     def __init__(self, config):
-        self.up_pipeline_x4 = StableDiffusionUpscalePipeline.from_pretrained(
-                        'stabilityai/stable-diffusion-x4-upscaler',
+        
+        # Carrega o modelo Real-ESRGAN
+        # Configurações do modelo
+        self.scale = 2  # Fator de upscaling (4x)
+        self.tile_size = 0 # 512  # Processa a imagem em blocos para economizar VRAM
+        self.tile_pad = 10
+        #self.device = "cuda" #config.device  # Assume que config.device é "cuda" ou "cpu"
+
+        model = RRDBNet(
+            num_in_ch=3, 
+            num_out_ch=3, 
+            num_feat=64, 
+            num_block=23
+        )
+
+        self.upsampler = RealESRGANer(
+            scale=self.scale,
+            model_path="https://github.com/xinntao/Real-ESRGAN/releases/download/v0.1.0/RealESRGAN_x4plus.pth",
+            model=model,
+            tile=self.tile_size,
+            tile_pad=self.tile_pad,
+            device="cuda",
+            pre_pad=10
+        )
+        
+        # StableDiffusionUpscalePipeline
+        self.up_pipeline_x2 = StableDiffusionUpscalePipeline.from_pretrained(
+                        'stabilityai/sd-x2-latent-upscaler', #'stabilityai/stable-diffusion-x4-upscaler',
                         variant="fp16",
                         torch_dtype=torch.float16,
-                    ).to("cuda") # to(config.device)
+                    ).to("cuda") # to(config.device
+        
         self.up_pipeline_x4.set_progress_bar_config(disable=False)
 
     def __call__(self, image, prompt=''):
         with torch.no_grad():
-            upscaled_image = self.up_pipeline_x4(
+            
+            # Inferencia com Real-ESRGAN
+            img_array = np.array(image)
+            upscaled_array, _ = self.upsampler.enhance(
+                img_array, 
+                outscale=self.scale
+            )
+            upscaled_image = Image.fromarray(upscaled_array)
+            
+            
+            # Inferencia com StableDiffusionUpscalePipeline
+            upscaled_image = self.up_pipeline_x2(
                 prompt="high quality, detailed",
                 negative_prompt="blurry, low quality, artifacts",
-                image=image,
-                guidance_scale=3.5,
-                num_inference_steps=15,
+                image=upscaled_image,
+                guidance_scale=0,
+                num_inference_steps=5,
             ).images[0]
 
         return upscaled_image
+    
+import codecs
 
-# import torch
-# from diffusers import ControlNetModel, StableDiffusionXLControlNetPipeline
-# from PIL import Image
-
-# class Image_Super_Net():
-#     def __init__(self, config):
-#         # Usando ControlNet público para upscaling
-#         controlnet_model = "diffusers/controlnet-depth-sdxl-1.0"
-        
-#         self.controlnet = ControlNetModel.from_pretrained(
-#             controlnet_model,
-#             torch_dtype=torch.float16,
-#             variant="fp16"
-#         )
-        
-#         self.pipe = StableDiffusionXLControlNetPipeline.from_pretrained(
-#             "stabilityai/stable-diffusion-xl-base-1.0",
-#             controlnet=self.controlnet,
-#             torch_dtype=torch.float16,
-#             variant="fp16"
-#         ).to("cuda")
-        
-#         self.pipe.set_progress_bar_config(disable=False)
-
-#     def __call__(self, image, prompt=''):
-#         # Pré-processamento adaptado para SDXL
-#         w, h = image.size
-#         control_image = image.resize((w*2, h*2), Image.Resampling.LANCZOS)
-        
-#         with torch.no_grad():
-#             upscaled_image = self.pipe(
-#                 prompt=f"high quality, detailed, {prompt}",
-#                 negative_prompt="blurry, low quality, artifacts",
-#                 image=control_image,
-#                 num_inference_steps=5,
-#                 controlnet_conditioning_scale=0.65,
-#                 guidance_scale=7.5
-#             ).images[0]
-            
-#         return upscaled_image
