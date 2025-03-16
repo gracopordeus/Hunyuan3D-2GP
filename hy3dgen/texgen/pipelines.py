@@ -212,7 +212,8 @@ class Hunyuan3DPaintPipeline:
                        zip(selected_camera_azims, selected_camera_elevs)]
         multiviews = self.models['multiview_model'](image_prompt, normal_maps + position_maps, camera_info)
         
-        for i in tqdm(range(len(multiviews)), desc=f"{i+1}/{len(multiviews)}"):
+        i=0
+        for i in tqdm(range(len(multiviews)), desc="multiviews i"):
             multiviews[i] = self.models['super_model'](multiviews[i])
             torch.cuda.empty_cache()
             multiviews[i] = multiviews[i].resize(
