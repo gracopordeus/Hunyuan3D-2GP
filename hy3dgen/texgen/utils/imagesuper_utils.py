@@ -49,14 +49,14 @@ class Image_Super_Net():
     def __call__(self, image, prompt=''):
         # Pré-processamento adaptado para SDXL
         w, h = image.size
-        control_image = image.resize((w*4, h*4), Image.Resampling.LANCZOS)
+        control_image = image.resize((w*2, h*2), Image.Resampling.LANCZOS)
         
         with torch.no_grad():
             upscaled_image = self.pipe(
                 prompt=f"high quality, detailed, {prompt}",
                 negative_prompt="blurry, low quality, artifacts",
                 image=control_image,
-                num_inference_steps=30,
+                num_inference_steps=5,
                 controlnet_conditioning_scale=0.65,
                 guidance_scale=7.5
             ).images[0]
