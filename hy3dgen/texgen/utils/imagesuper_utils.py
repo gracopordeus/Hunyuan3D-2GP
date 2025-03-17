@@ -53,7 +53,7 @@ class Image_Super_Net():
     
         # Carrega o modelo Real-ESRGAN
         # Configurações do modelo
-        self.scale = 4  # Fator de upscaling (4x)
+        self.scale = 6  # Fator de upscaling (4x)
         self.tile_size = 0 # 512  # Processa a imagem em blocos para economizar VRAM
         self.tile_pad = 10
         self.device = config.device  # Assume que config.device é "cuda" ou "cpu"
@@ -71,13 +71,13 @@ class Image_Super_Net():
             num_feat=128, 
             num_block=23,
             num_grow_ch=32,
-            scale=4
+            scale=self.scale
         )
         
         model.load_state_dict(state_dict, strict = True)
 
         self.upsampler = RealESRGANer(
-            scale=4,
+            scale=self.scale,
             model_path=model_path,
             model=model,
             tile=0,
