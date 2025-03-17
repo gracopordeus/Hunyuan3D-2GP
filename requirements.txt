@@ -27,6 +27,7 @@ xatlas
 
 # HD texture:
 opencv-python
+libopencv-dev
 pypatchmatch
 basicsr
 realesrgan
