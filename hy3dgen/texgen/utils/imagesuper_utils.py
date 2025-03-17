@@ -55,29 +55,25 @@ class Image_Super_Net():
         # Configurações do modelo
         self.scale = 4  # Fator de upscaling (4x)
         self.tile_size = 0 # 512  # Processa a imagem em blocos para economizar VRAM
-        self.tile_pad = 10
+        self.tile_pad = 0 # 10
         self.device = config.device  # Assume que config.device é "cuda" ou "cpu"
 
         model_path = "./RealESRGAN_x4plus.pth"
-
-        state_dict = torch.load(model_path, map_location="cpu")['params_ema']
         
         model = RRDBNet(
             num_in_ch=3, 
             num_out_ch=3, 
             num_feat=128, 
-            num_block=23,
-            scale=self.scale
+            num_block=23
         )
         
-        model.load_state_dict(state_dict, strict = True)
-
         self.upsampler = RealESRGANer(
             scale=self.scale,
             model_path=model_path,
             model=model,
-            tile=0,
-            tile_pad=0,
+            tile=self.tile_size,
+            tile_pad=self.tile_pad,
+            device=self.device,
             pre_pad=0
         )
 
@@ -86,10 +82,12 @@ class Image_Super_Net():
             
             # Inferencia com Real-ESRGAN
             img_array = np.array(image)
+            
             upscaled_array, _ = self.upsampler.enhance(
                 img_array, 
                 outscale=self.scale
             )
+            
             upscaled_image = Image.fromarray(upscaled_array)
 
         return upscaled_image
