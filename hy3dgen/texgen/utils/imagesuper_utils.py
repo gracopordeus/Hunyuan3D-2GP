@@ -63,7 +63,7 @@ class Image_Super_Net():
         model = RRDBNet(
             num_in_ch=3, 
             num_out_ch=3, 
-            num_feat=128, 
+            num_feat=64, 
             num_block=23
         )
         
