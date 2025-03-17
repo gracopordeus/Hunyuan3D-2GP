@@ -24,6 +24,7 @@
 
 # Caminho do arquivo (altere conforme o resultado do comando acima)
 import codecs
+
 print('Finding /usr/local/lib/python3.10/dist-packages/basicsr/data/degradations.py to update torchvision.transforms.functional_tensor location...')
 file_path = "/usr/local/lib/python3.10/dist-packages/basicsr/data/degradations.py"
 # Lê o conteúdo do arquivo
@@ -51,13 +52,13 @@ import numpy as np
     
 class Image_Super_Net():
     def __init__(self, config):
-        
+    
         # Carrega o modelo Real-ESRGAN
         # Configurações do modelo
-        self.scale = 2  # Fator de upscaling (4x)
+        self.scale = 6  # Fator de upscaling (4x)
         self.tile_size = 0 # 512  # Processa a imagem em blocos para economizar VRAM
         self.tile_pad = 10
-        #self.device = "cuda" #config.device  # Assume que config.device é "cuda" ou "cpu"
+        self.device = config.device  # Assume que config.device é "cuda" ou "cpu"
 
         model = RRDBNet(
             num_in_ch=3, 
@@ -76,12 +77,12 @@ class Image_Super_Net():
             pre_pad=10
         )
         
-        # StableDiffusionUpscalePipeline
-        self.up_pipeline_x2 = StableDiffusionUpscalePipeline.from_pretrained(
-                        'stabilityai/sd-x2-latent-upscaler', #'stabilityai/stable-diffusion-x4-upscaler',
-                        variant="fp16",
-                        torch_dtype=torch.float16,
-                    ).to("cuda") # to(config.device
+        # # StableDiffusionUpscalePipeline
+        # self.up_pipeline_x2 = StableDiffusionUpscalePipeline.from_pretrained(
+        #                 'stabilityai/sd-x2-latent-upscaler', #'stabilityai/stable-diffusion-x4-upscaler',
+        #                 variant="fp16",
+        #                 torch_dtype=torch.float16,
+        #             ).to("cuda") # to(config.device
         
         self.up_pipeline_x4.set_progress_bar_config(disable=False)
 
@@ -97,14 +98,14 @@ class Image_Super_Net():
             upscaled_image = Image.fromarray(upscaled_array)
             
             
-            # Inferencia com StableDiffusionUpscalePipeline
-            upscaled_image = self.up_pipeline_x2(
-                prompt="high quality, detailed",
-                negative_prompt="blurry, low quality, artifacts",
-                image=upscaled_image,
-                guidance_scale=0,
-                num_inference_steps=5,
-            ).images[0]
+            # # Inferencia com StableDiffusionUpscalePipeline
+            # upscaled_image = self.up_pipeline_x2(
+            #     prompt="high quality, detailed",
+            #     negative_prompt="blurry, low quality, artifacts",
+            #     image=upscaled_image,
+            #     guidance_scale=0,
+            #     num_inference_steps=5,
+            # ).images[0]
 
         return upscaled_image
     
