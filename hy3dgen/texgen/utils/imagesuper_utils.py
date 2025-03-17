@@ -52,10 +52,6 @@ class Image_Super_Net():
     def __init__(self, config):
         # Configurações do modelo
         self.scale = 4  # Fator de upscaling (4x)
-        self.tile_size = 0  # Processa a imagem em blocos para economizar VRAM
-        self.tile_pad = 0
-        self.device = config.device  # Assume que config.device é "cuda" ou "cpu"
-
         model_path = "./RealESRGAN_x4plus_anime_6B.pth"
 
         # Carrega o modelo Real-ESRGAN
@@ -63,17 +59,22 @@ class Image_Super_Net():
             num_in_ch=3, 
             num_out_ch=3, 
             num_feat=64, 
-            num_block=23
+            num_block=6,
+            num_grow_ch=32,
+            scale=self.scale
         )
+
+        state_dict = torch.load(model_path, map_location=torch.device('cuda'))['params_ema']
+
+        model.load_state_dict(state_dict, strict=True)
 
         self.upsampler = RealESRGANer(
             scale=self.scale,
             model_path=model_path,
             model=model,
-            tile=self.tile_size,
-            tile_pad=self.tile_pad,
-            device=self.device,
-            pre_pad=0
+            tile=0,
+            pre_pad=0,
+            half=True
         )
 
     def __call__(self, image, prompt=''):  # Ignora o prompt (não usado no Real-ESRGAN)
