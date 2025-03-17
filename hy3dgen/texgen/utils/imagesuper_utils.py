@@ -22,9 +22,9 @@
 # fine-tuning enabling code and other elements of the foregoing made publicly available
 # by Tencent in accordance with TENCENT HUNYUAN COMMUNITY LICENSE AGREEMENT.
 
-# Caminho do arquivo (altere conforme o resultado do comando acima)
 import codecs
 
+# Caminho do arquivo (altere conforme o resultado do comando acima)
 print('Finding /usr/local/lib/python3.10/dist-packages/basicsr/data/degradations.py to update torchvision.transforms.functional_tensor location...')
 file_path = "/usr/local/lib/python3.10/dist-packages/basicsr/data/degradations.py"
 # Lê o conteúdo do arquivo
@@ -47,26 +47,25 @@ from basicsr.archs.rrdbnet_arch import RRDBNet
 from realesrgan import RealESRGANer
 from PIL import Image
 import numpy as np
-    
+
 class Image_Super_Net():
     def __init__(self, config):
-    
-        # Carrega o modelo Real-ESRGAN
         # Configurações do modelo
         self.scale = 4  # Fator de upscaling (4x)
-        self.tile_size = 0 # 512  # Processa a imagem em blocos para economizar VRAM
-        self.tile_pad = 0 # 10
-        self.device = "cpu"  # Assume que config.device é "cuda" ou "cpu"
+        self.tile_size = 0  # Processa a imagem em blocos para economizar VRAM
+        self.tile_pad = 0
+        self.device = config.device  # Assume que config.device é "cuda" ou "cpu"
 
         model_path = "./RealESRGAN_x4plus_anime_6B.pth"
-        
+
+        # Carrega o modelo Real-ESRGAN
         model = RRDBNet(
             num_in_ch=3, 
             num_out_ch=3, 
             num_feat=64, 
             num_block=23
         )
-        
+
         self.upsampler = RealESRGANer(
             scale=self.scale,
             model_path=model_path,
@@ -77,18 +76,18 @@ class Image_Super_Net():
             pre_pad=0
         )
 
-    def __call__(self, image, prompt=''):
-        with torch.no_grad():
-            
-            # Inferencia com Real-ESRGAN
-            img_array = np.array(image)
-            
-            upscaled_array, _ = self.upsampler.enhance(
-                img_array, 
-                outscale=self.scale
-            )
-            
-            upscaled_image = Image.fromarray(upscaled_array)
+    def __call__(self, image, prompt=''):  # Ignora o prompt (não usado no Real-ESRGAN)
+        # Converte PIL.Image para numpy array
+        img_array = np.array(image)
+        
+        # Realiza o upscaling
+        upscaled_array, _ = self.upsampler.enhance(
+            img_array, 
+            outscale=self.scale
+        )
+        
+        # Converte de volta para PIL.Image
+        upscaled_image = Image.fromarray(upscaled_array)
 
         return upscaled_image
 
