@@ -89,8 +89,6 @@ class Light_Shadow_Remover():
             image = Image.fromarray(image_array)
 
             image_tensor = torch.tensor(np.array(image) / 255.0).to(self.device)
-            alpha = image_tensor[:, :, 3:]
-            rgb_target = image_tensor[:, :, :3]
         else:
             image_tensor = torch.tensor(np.array(image) / 255.0).to(self.device)
             alpha = torch.ones_like(image_tensor)[:, :, :1]
@@ -99,12 +97,12 @@ class Light_Shadow_Remover():
         image = image.convert('RGB')
 
         image = self.pipeline(
-            prompt="3D",
+            prompt="3D, high definition, sharp focus, realistic details",
             image=image,
             generator=torch.manual_seed(42),
             height=512,
             width=512,
-            num_inference_steps=50,
+            num_inference_steps=100,
             image_guidance_scale=self.cfg_image,
             guidance_scale=self.cfg_text,
         ).images[0]
