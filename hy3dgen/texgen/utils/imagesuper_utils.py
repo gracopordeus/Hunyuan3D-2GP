@@ -58,12 +58,13 @@ class Image_Super_Net():
         self.tile_pad = 10
         self.device = config.device  # Assume que config.device é "cuda" ou "cpu"
 
-        model_path = "https://github.com/xinntao/Real-ESRGAN/releases/download/v0.1.0/RealESRGAN_x4plus.pth"
+        #model_path = "https://github.com/xinntao/Real-ESRGAN/releases/download/v0.1.0/RealESRGAN_x4plus.pth"
         
         state_dict = torch.load(
-            model_path, 
+            model_path= "https://github.com/xinntao/Real-ESRGAN/releases/download/v0.1.0/RealESRGAN_x4plus.pth", 
             map_location=torch.device('cuda'),
-            weights_only=True)['params_ema']
+            weights_only=True
+            )['params_ema']
         
         model = RRDBNet(
             num_in_ch=3, 
@@ -73,16 +74,15 @@ class Image_Super_Net():
             scale=self.scale
         )
         
-        model.load_state_dict(state_dict, strict = False)
+        model.load_state_dict(state_dict, strict = True)
 
         self.upsampler = RealESRGANer(
             scale=self.scale,
-            model_path=model_path,
+            model_path= "https://github.com/xinntao/Real-ESRGAN/releases/download/v0.1.0/RealESRGAN_x4plus.pth",
             model=model,
             tile=0,
             tile_pad=0,
-            pre_pad=0,
-            half=True
+            pre_pad=0
         )
 
     def __call__(self, image, prompt=''):
