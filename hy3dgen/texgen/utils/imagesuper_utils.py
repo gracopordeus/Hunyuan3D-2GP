@@ -61,8 +61,8 @@ class Image_Super_Net():
         #model_path = "https://github.com/xinntao/Real-ESRGAN/releases/download/v0.1.0/RealESRGAN_x4plus.pth"
         
         state_dict = torch.load(
-            model_path= "https://github.com/xinntao/Real-ESRGAN/releases/download/v0.1.0/RealESRGAN_x4plus.pth", 
-            map_location=torch.device(config.device),
+            model_path= "RealESRGAN_x4plus.pth", 
+            map_location=torch.device("cuda"),
             weights_only=True
             )['params_ema']
         
@@ -78,7 +78,7 @@ class Image_Super_Net():
 
         self.upsampler = RealESRGANer(
             scale=self.scale,
-            model_path= "https://github.com/xinntao/Real-ESRGAN/releases/download/v0.1.0/RealESRGAN_x4plus.pth",
+            model_path= "RealESRGAN_x4plus.pth",
             model=model,
             tile=0,
             tile_pad=0,
