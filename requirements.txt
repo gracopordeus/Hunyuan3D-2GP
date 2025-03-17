@@ -26,6 +26,7 @@ xatlas
 #facexlib
 
 # HD texture:
+cv2
 basicsr
 realesrgan
 

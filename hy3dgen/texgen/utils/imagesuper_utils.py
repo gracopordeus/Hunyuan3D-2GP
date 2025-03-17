@@ -43,6 +43,8 @@ with codecs.open(file_path, "w", "utf-8") as f:
 print("Successfully!")
 
 import torch
+import cv2
+from pypatchmatch import patch_match
 from basicsr.archs.rrdbnet_arch import RRDBNet
 from realesrgan import RealESRGANer
 from PIL import Image
@@ -76,6 +78,18 @@ class Image_Super_Net():
             pre_pad=0,
             half=True
         )
+        
+    def apply_texture_synthesis(image, patch_size=8, iterations=3):
+        # Converta a imagem para float32 e normalize
+        img_float = image.astype(np.float32) / 255.0
+
+        # Aplique o PatchMatch para síntese de textura
+        synthesized = patch_match.inpaint(img_float, patch_size=patch_size, iterations=iterations)
+
+        # Converta de volta para uint8
+        synthesized = (synthesized * 255).astype(np.uint8)
+        return synthesized
+
 
     def __call__(self, image, prompt=''):  # Ignora o prompt (não usado no Real-ESRGAN)
         # Converte PIL.Image para numpy array
@@ -87,8 +101,18 @@ class Image_Super_Net():
             outscale=self.scale
         )
         
-        # Converte de volta para PIL.Image
-        upscaled_image = Image.fromarray(upscaled_array)
+        # Verificação crítica (formato e cores):
+        if upscaled_array.dtype != np.uint8:  # Se o modelo retornar float
+            upscaled_array = (upscaled_array * 255).astype(np.uint8)
+            
+        # Se a saída for BGR (comum em OpenCV), converta para RGB
+        upscaled_array = cv2.cvtColor(upscaled_array, cv2.COLOR_BGR2RGB)  # 👈 Importante!
+        
+        # Aplica síntese de textura
+        imagem_texturizada = self.apply_texture_synthesis(upscaled_array)  # 👈 Usando self.
+        
+        # Finalizando o upscaling
+        upscaled_image = Image.fromarray(imagem_texturizada)
 
         return upscaled_image
 
