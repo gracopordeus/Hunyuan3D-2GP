@@ -43,8 +43,6 @@ with codecs.open(file_path, "w", "utf-8") as f:
 print("Successfully!")
 
 import torch
-import cv2
-from pypatchmatch import patch_match
 from basicsr.archs.rrdbnet_arch import RRDBNet
 from realesrgan import RealESRGANer
 from PIL import Image
