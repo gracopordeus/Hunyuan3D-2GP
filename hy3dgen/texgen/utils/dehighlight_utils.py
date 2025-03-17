@@ -109,10 +109,10 @@ class Light_Shadow_Remover():
             guidance_scale=self.cfg_text,
         ).images[0]
 
-        image_tensor = torch.tensor(np.array(image)/255.0).to(self.device)
-        rgb_src = image_tensor[:,:,:3]
+        # image_tensor = torch.tensor(np.array(image)/255.0).to(self.device)
+        # rgb_src = image_tensor[:,:,:3]
         #image = self.recorrect_rgb(rgb_src, rgb_target, alpha)
-        image = image[:,:,:3]*image[:,:,3:] + torch.ones_like(image[:,:,:3])*(1.0-image[:,:,3:])
-        image = Image.fromarray((image.cpu().numpy()*255).astype(np.uint8))
+        # image = image[:,:,:3]*image[:,:,3:] + torch.ones_like(image[:,:,:3])*(1.0-image[:,:,3:])
+        # image = Image.fromarray((image.cpu().numpy()*255).astype(np.uint8))
 
         return image
