@@ -58,7 +58,7 @@ class Image_Super_Net():
         self.tile_pad = 10
         self.device = config.device  # Assume que config.device é "cuda" ou "cpu"
 
-        model_path = "./kaggle/working/Hunyuan3D-2GP/RealESRGAN_x4plus.pth"
+        model_path = "./RealESRGAN_x4plus.pth"
 
         state_dict = torch.load(
             model_path, 
