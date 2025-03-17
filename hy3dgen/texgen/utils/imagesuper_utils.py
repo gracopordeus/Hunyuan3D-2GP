@@ -45,8 +45,6 @@ print("Successfully!")
 import torch
 from basicsr.archs.rrdbnet_arch import RRDBNet
 from realesrgan import RealESRGANer
-#from diffusers import StableDiffusionUpscalePipeline
-
 from PIL import Image
 import numpy as np
     
@@ -63,8 +61,9 @@ class Image_Super_Net():
         model_path = 'RealEsrgan_x4plus.pth'
         
         state_dict = torch.load(
-            'RealEsrgan_x4plus.pth', 
-            map_location=torch.device('cuda'))['params_ema']
+            model_path, 
+            map_location=torch.device('cuda'),
+            weights_only=True)['params_ema']
         
         model = RRDBNet(
             num_in_ch=3, 
@@ -86,15 +85,6 @@ class Image_Super_Net():
             pre_pad=0,
             half=True
         )
-        
-        # # StableDiffusionUpscalePipeline
-        # self.up_pipeline_x2 = StableDiffusionUpscalePipeline.from_pretrained(
-        #                 'stabilityai/sd-x2-latent-upscaler', #'stabilityai/stable-diffusion-x4-upscaler',
-        #                 variant="fp16",
-        #                 torch_dtype=torch.float16,
-        #             ).to("cuda") # to(config.device
-        
-        #self.up_pipeline_x4.set_progress_bar_config(disable=False)
 
     def __call__(self, image, prompt=''):
         with torch.no_grad():
@@ -106,18 +96,6 @@ class Image_Super_Net():
                 outscale=self.scale
             )
             upscaled_image = Image.fromarray(upscaled_array)
-            
-            
-            # # Inferencia com StableDiffusionUpscalePipeline
-            # upscaled_image = self.up_pipeline_x2(
-            #     prompt="high quality, detailed",
-            #     negative_prompt="blurry, low quality, artifacts",
-            #     image=upscaled_image,
-            #     guidance_scale=0,
-            #     num_inference_steps=5,
-            # ).images[0]
 
         return upscaled_image
-    
-import codecs
 
