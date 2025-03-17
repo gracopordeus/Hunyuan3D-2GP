@@ -62,7 +62,7 @@ class Image_Super_Net():
         
         state_dict = torch.load(
             model_path= "https://github.com/xinntao/Real-ESRGAN/releases/download/v0.1.0/RealESRGAN_x4plus.pth", 
-            map_location=torch.device('cuda'),
+            map_location=torch.device(config.device),
             weights_only=True
             )['params_ema']
         
