@@ -45,7 +45,7 @@ print("Successfully!")
 import torch
 from basicsr.archs.rrdbnet_arch import RRDBNet
 from realesrgan import RealESRGANer
-from diffusers import StableDiffusionUpscalePipeline
+#from diffusers import StableDiffusionUpscalePipeline
 
 from PIL import Image
 import numpy as np
@@ -55,26 +55,36 @@ class Image_Super_Net():
     
         # Carrega o modelo Real-ESRGAN
         # Configurações do modelo
-        self.scale = 6  # Fator de upscaling (4x)
+        self.scale = 4  # Fator de upscaling (4x)
         self.tile_size = 0 # 512  # Processa a imagem em blocos para economizar VRAM
         self.tile_pad = 10
         self.device = config.device  # Assume que config.device é "cuda" ou "cpu"
 
+        model_path = 'RealEsrgan_x4plus.pth'
+        
+        state_dict = torch.load(
+            'RealEsrgan_x4plus.pth', 
+            map_location=torch.device('cuda'))['params_ema']
+        
         model = RRDBNet(
             num_in_ch=3, 
             num_out_ch=3, 
-            num_feat=64, 
-            num_block=23
+            num_feat=128, 
+            num_block=23,
+            num_grow_ch=32,
+            scale=4
         )
+        
+        model.load_state_dict(state_dict, strict = True)
 
         self.upsampler = RealESRGANer(
-            scale=self.scale,
-            model_path="https://github.com/xinntao/Real-ESRGAN/releases/download/v0.1.0/RealESRGAN_x4plus.pth",
+            scale=4,
+            model_path=model_path,
             model=model,
-            tile=self.tile_size,
-            tile_pad=self.tile_pad,
-            device="cuda",
-            pre_pad=10
+            tile=0,
+            tile_pad=0,
+            pre_pad=0,
+            half=True
         )
         
         # # StableDiffusionUpscalePipeline
@@ -84,7 +94,7 @@ class Image_Super_Net():
         #                 torch_dtype=torch.float16,
         #             ).to("cuda") # to(config.device
         
-        self.up_pipeline_x4.set_progress_bar_config(disable=False)
+        #self.up_pipeline_x4.set_progress_bar_config(disable=False)
 
     def __call__(self, image, prompt=''):
         with torch.no_grad():
