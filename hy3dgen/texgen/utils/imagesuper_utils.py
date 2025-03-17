@@ -58,7 +58,7 @@ class Image_Super_Net():
         self.tile_pad = 10
         self.device = config.device  # Assume que config.device é "cuda" ou "cpu"
 
-        model_path = 'RealEsrgan_x4plus.pth'
+        model_path = "https://github.com/xinntao/Real-ESRGAN/releases/download/v0.1.0/RealESRGAN_x4plus.pth"
         
         state_dict = torch.load(
             model_path, 
