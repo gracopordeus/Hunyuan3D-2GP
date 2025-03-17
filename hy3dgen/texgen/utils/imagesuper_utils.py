@@ -56,9 +56,9 @@ class Image_Super_Net():
         self.scale = 4  # Fator de upscaling (4x)
         self.tile_size = 0 # 512  # Processa a imagem em blocos para economizar VRAM
         self.tile_pad = 0 # 10
-        self.device = config.device  # Assume que config.device é "cuda" ou "cpu"
+        self.device = "cpu" #config.device  # Assume que config.device é "cuda" ou "cpu"
 
-        model_path = "./RealESRGAN_x4plus.pth"
+        model_path = "./RealESRGAN_x4plus_anime_6B.pth"
         
         model = RRDBNet(
             num_in_ch=3, 
