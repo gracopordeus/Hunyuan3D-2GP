@@ -60,11 +60,8 @@ class Image_Super_Net():
 
         model_path = "./RealESRGAN_x4plus.pth"
 
-        state_dict = torch.load(
-            model_path, 
-            map_location=torch.device("cuda"),
-            weights_only=True
-        )['params_ema']
+        state_dict = torch.load(model_path, map_location="cpu")['params_ema']
+        state_dict = {k: v.to(config.device) for k, v in state_dict.items()}
         
         model = RRDBNet(
             num_in_ch=3, 
