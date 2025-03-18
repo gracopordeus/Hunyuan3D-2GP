@@ -22,75 +22,52 @@
 # fine-tuning enabling code and other elements of the foregoing made publicly available
 # by Tencent in accordance with TENCENT HUNYUAN COMMUNITY LICENSE AGREEMENT.
 
-import codecs
-
-# Caminho do arquivo (altere conforme o resultado do comando acima)
-# !find -name "degradations.py"
-print('Finding /usr/local/lib/python3.10/dist-packages/basicsr/data/degradations.py to update torchvision.transforms.functional_tensor location...')
-file_path = "/usr/local/lib/python3.10/dist-packages/basicsr/data/degradations.py"
-# Lê o conteúdo do arquivo
-with codecs.open(file_path, "r", "utf-8") as f:
-    content = f.read()
-
-# Substitui a linha problemática
-new_content = content.replace(
-    "from torchvision.transforms.functional_tensor import rgb_to_grayscale",
-    "from torchvision.transforms.functional import rgb_to_grayscale"
-)
-
-# Salva as alterações
-with codecs.open(file_path, "w", "utf-8") as f:
-    f.write(new_content)
-print("Successfully!")
-
 import torch
-from basicsr.archs.rrdbnet_arch import RRDBNet
-from realesrgan import RealESRGANer
-from PIL import Image
-import numpy as np
+from diffusers import ControlNetModel, StableDiffusionXLControlNetPipeline, AutoencoderKL
+from diffusers import EulerAncestralDiscreteScheduler
+
+from .imagesuper_filter import *
 
 class Image_Super_Net():
     def __init__(self, config):
-        # Configurações do modelo
-        self.scale = 4  # Fator de upscaling (4x)
-        model_path = "./RealESRGAN_x4plus_anime_6B.pth"
+        
+        pipe = StableDiffusionXLControlNetPipeline.from_pretrained(
+            "stabilityai/stable-diffusion-xl-base-1.0",
+            controlnet=ControlNetModel.from_pretrained(
+                "xinsir/controlnet-tile-sdxl-1.0",
+                torch_dtype=torch.float16
+            ),
+            vae=AutoencoderKL.from_pretrained(
+                "madebyollin/sdxl-vae-fp16-fix", 
+                torch_dtype=torch.float16
+            ),
+            scheduler=EulerAncestralDiscreteScheduler.from_pretrained(
+                "stabilityai/stable-diffusion-xl-base-1.0", 
+                subfolder="scheduler"
+            ),
+            torch_dtype=torch.float16,
+            use_safetensors=True
+        ).to("cuda")
+        
+        self.pipe
 
-        # Carrega o modelo Real-ESRGAN
-        model = RRDBNet(
-            num_in_ch=3, 
-            num_out_ch=3, 
-            num_feat=64, 
-            num_block=6,
-            num_grow_ch=32,
-            scale=self.scale
-        )
-
-        state_dict = torch.load(model_path, map_location=torch.device('cuda'))['params_ema']
-
-        model.load_state_dict(state_dict, strict=True)
-
-        self.upsampler = RealESRGANer(
-            scale=self.scale,
-            model_path=model_path,
-            model=model,
-            tile=0,
-            pre_pad=0,
-            half=True
-        )
-
-
-    def __call__(self, image, prompt=''):  # Ignora o prompt (não usado no Real-ESRGAN)
+    def __call__(self, image, prompt=''): 
         # Converte PIL.Image para numpy array
-        img_array = np.array(image)
+        image = controlnet_img(image)
         
-        # Realiza o upscaling
-        upscaled_array, _ = self.upsampler.enhance(
-            img_array, 
-            outscale=self.scale
-        )
-        
-        # Finalizando o upscaling
-        upscaled_image = Image.fromarray(upscaled_array)
+        controlnet_conditioning_scale = 1.0  
+        prompt = "3D, highly detailed, sharp focus,  high textures, 4k, Game AAA"
+        negative_prompt = 'longbody, lowres, bad anatomy, bad hands, missing fingers, missing face, extra digit, fewer digits, cropped, worst quality, low quality'
+
+        upscaled_image = self.pipe(
+            prompt,
+            negative_prompt=negative_prompt,
+            image=image,
+            controlnet_conditioning_scale=controlnet_conditioning_scale,
+            width=1024,
+            height=1024,
+            num_inference_steps=50,
+        ).images[0]
 
         return upscaled_image
 
