@@ -31,7 +31,7 @@ from .imagesuper_filter import *
 class Image_Super_Net():
     def __init__(self, config):
         
-        pipe = StableDiffusionXLControlNetPipeline.from_pretrained(
+        self.pipe = StableDiffusionXLControlNetPipeline.from_pretrained(
             "stabilityai/stable-diffusion-xl-base-1.0",
             controlnet=ControlNetModel.from_pretrained(
                 "xinsir/controlnet-tile-sdxl-1.0",
