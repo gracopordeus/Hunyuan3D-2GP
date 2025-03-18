@@ -39,7 +39,7 @@ class Light_Shadow_Remover():
             config.light_remover_ckpt_path,
             torch_dtype=torch.float16,
             safety_checker=None,
-        )
+        )   
         pipeline.scheduler = EulerAncestralDiscreteScheduler.from_config(pipeline.scheduler.config)
         pipeline.set_progress_bar_config(disable=False)
 
