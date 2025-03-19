@@ -49,6 +49,9 @@ class Image_Super_Net():
             use_safetensors=True
         ).to("cuda")
         
+        # self.pipe.enable_model_cpu_offload()
+        # self.pipe.enable_vae_slicing()
+        
         self.pipe
 
     def __call__(self, image, prompt=''): 
