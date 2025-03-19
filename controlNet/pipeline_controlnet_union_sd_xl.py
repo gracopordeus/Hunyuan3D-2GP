@@ -40,7 +40,7 @@ from diffusers.loaders import (
 from diffusers.models.unets.unet_2d_condition import ImageProjection, UNet2DConditionModel
 from diffusers.models import AutoencoderKL, ControlNetModel
 from diffusers.pipelines.controlnet.multicontrolnet import MultiControlNetModel
-from controlnet_union import ControlNetModel_Union
+from controlNet.controlnet_union import ControlNetModel_Union
 from diffusers.models.attention_processor import (
     AttnProcessor2_0,
     LoRAAttnProcessor2_0,
