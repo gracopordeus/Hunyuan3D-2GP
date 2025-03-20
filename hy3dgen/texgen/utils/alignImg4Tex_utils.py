@@ -31,12 +31,23 @@ from diffusers import StableDiffusionControlNetPipeline, StableDiffusionXLContro
 
 class Img2img_Control_Ip_adapter:
     def __init__(self, device):
-        controlnet = ControlNetModel.from_pretrained('lllyasviel/control_v11f1p_sd15_depth', torch_dtype=torch.float16,
-                                                     variant="fp16", use_safetensors=True)
-        pipe = StableDiffusionControlNetPipeline.from_pretrained(
-            'runwayml/stable-diffusion-v1-5', controlnet=controlnet, torch_dtype=torch.float16, use_safetensors=True
+        controlnet = ControlNetModel.from_pretrained(
+            'lllyasviel/control_v11f1p_sd15_depth', 
+            torch_dtype=torch.float16,
+            variant="fp16", 
+            use_safetensors=True
         )
-        pipe.load_ip_adapter('h94/IP-Adapter', subfolder="models", weight_name="ip-adapter-plus_sd15.safetensors")
+        pipe = StableDiffusionControlNetPipeline.from_pretrained(
+            'runwayml/stable-diffusion-v1-5', 
+            controlnet=controlnet, 
+            torch_dtype=torch.float16, 
+            use_safetensors=True
+        )
+        pipe.load_ip_adapter(
+            'h94/IP-Adapter', 
+            subfolder="models", 
+            weight_name="ip-adapter-plus_sd15.safetensors"
+        )
         pipe.set_ip_adapter_scale(0.7)
 
         pipe.scheduler = EulerAncestralDiscreteScheduler.from_config(pipe.scheduler.config)
