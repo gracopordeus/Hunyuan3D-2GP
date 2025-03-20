@@ -42,6 +42,15 @@ new_content = content.replace(
 with codecs.open(file_path, "w", "utf-8") as f:
     f.write(new_content)
 print("Successfully!")
+%cd /kaggle/working/Hunyuan3D-2GP/mod-control-tile-upscaler-sdxl
+from pipeline.mod_controlnet_tile_sr_sdxl import StableDiffusionXLControlNetTileSRPipeline
+from pipeline.util import (
+    create_hdr_effect,
+    progressive_upscale,
+    quantize_8bit,
+    select_scheduler,
+)
+%cd /kaggle/working/Hunyuan3D-2GP
 
 import torch
 from PIL import Image
