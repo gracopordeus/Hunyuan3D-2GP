@@ -29,8 +29,6 @@ import numpy as np
 import torch
 from diffusers import DiffusionPipeline
 from diffusers import EulerAncestralDiscreteScheduler
-from IPython.display import display
-
 
 class Multiview_Diffusion_Net():
     def __init__(self, config) -> None:
@@ -84,5 +82,4 @@ class Multiview_Diffusion_Net():
         kwargs["position_imgs"] = position_image
         
         mvd_image = self.pipeline(input_image, num_inference_steps=50, **kwargs).images
-        display(mvd_image)
         return mvd_image

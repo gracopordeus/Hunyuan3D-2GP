@@ -30,6 +30,7 @@ import numpy as np
 import torch
 from PIL import Image
 from tqdm import tqdm
+from IPython.display import display
 
 from .differentiable_renderer.mesh_render import MeshRender
 from .utils.dehighlight_utils import Light_Shadow_Remover
@@ -214,6 +215,7 @@ class Hunyuan3DPaintPipeline:
         
         i=0
         for i in tqdm(range(len(multiviews))):
+            display(multiviews[i])
             multiviews[i] = self.models['super_model'](multiviews[i])
             torch.cuda.empty_cache()
             multiviews[i] = multiviews[i].resize(
