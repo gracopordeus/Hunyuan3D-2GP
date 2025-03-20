@@ -80,7 +80,10 @@ class Image_Super_Net():
             use_safetensors=True, 
             variant="fp16"
         ).to("cuda")
-        
+
+        self.pipe.enable_model_cpu_offload()
+        self.pipe.enable_vae_tiling()
+        self.pipe.enable_vae_slicing()
         
         # Carrega o modelo Real-ESRGAN
         self.scale = 2
