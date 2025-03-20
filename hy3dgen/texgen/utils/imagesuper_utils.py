@@ -52,8 +52,8 @@ from IPython.display import display
 from diffusers import ControlNetUnionModel, AutoencoderKL, UNet2DConditionModel
 from diffusers import DDIMScheduler, EulerAncestralDiscreteScheduler
 from diffusers.utils import load_image
-from pipeline.mod_controlnet_tile_sr_sdxl import StableDiffusionXLControlNetTileSRPipeline
-from pipeline.util import (
+from mod_controlnet_tile_sr_sdxl import StableDiffusionXLControlNetTileSRPipeline
+from util import (
     create_hdr_effect,
     progressive_upscale,
     quantize_8bit,
