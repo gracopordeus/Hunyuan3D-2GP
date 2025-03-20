@@ -47,6 +47,7 @@ import torch
 from PIL import Image
 import numpy as np
 import cv2
+from IPython.display import display
 
 from diffusers import ControlNetUnionModel, AutoencoderKL, UNet2DConditionModel
 from diffusers import DDIMScheduler, EulerAncestralDiscreteScheduler
@@ -62,28 +63,28 @@ class Image_Super_Net():
     def __init__(self, config):
         # Carrega o Stable Diffusion XL 1.0 Upscaling com ajustes de textura
 
-        self.pipe = StableDiffusionXLControlNetTileSRPipeline.from_pretrained(
-                "SG161222/RealVisXL_V5.0", 
-            controlnet=ControlNetUnionModel.from_pretrained(
-                "brad-twinkl/controlnet-union-sdxl-1.0-promax", 
-                torch_dtype=torch.float16
-            ),
-            vae=AutoencoderKL.from_pretrained(
-                "madebyollin/sdxl-vae-fp16-fix", 
-                torch_dtype=torch.float16
-            ),
-            scheduler=EulerAncestralDiscreteScheduler.from_pretrained(
-                "stabilityai/stable-diffusion-xl-base-1.0", 
-                subfolder="scheduler"
-            ),
-            torch_dtype=torch.float16, 
-            use_safetensors=True, 
-            variant="fp16"
-        ).to(self.device)
+        # self.pipe = StableDiffusionXLControlNetTileSRPipeline.from_pretrained(
+        #         "SG161222/RealVisXL_V5.0", 
+        #     controlnet=ControlNetUnionModel.from_pretrained(
+        #         "brad-twinkl/controlnet-union-sdxl-1.0-promax", 
+        #         torch_dtype=torch.float16
+        #     ),
+        #     vae=AutoencoderKL.from_pretrained(
+        #         "madebyollin/sdxl-vae-fp16-fix", 
+        #         torch_dtype=torch.float16
+        #     ),
+        #     scheduler=EulerAncestralDiscreteScheduler.from_pretrained(
+        #         "stabilityai/stable-diffusion-xl-base-1.0", 
+        #         subfolder="scheduler"
+        #     ),
+        #     torch_dtype=torch.float16, 
+        #     use_safetensors=True, 
+        #     variant="fp16"
+        # ).to(self.device)
 
-        self.pipe.enable_model_cpu_offload()
-        self.pipe.enable_vae_tiling()
-        self.pipe.enable_vae_slicing()
+        # self.pipe.enable_model_cpu_offload()
+        # self.pipe.enable_vae_tiling()
+        # self.pipe.enable_vae_slicing()
         
         # Carrega o modelo Real-ESRGAN
         self.scale = 2
@@ -110,59 +111,59 @@ class Image_Super_Net():
 
     def __call__(self, image, prompt=''):
         
-        original_height = image.height
-        original_width = image.width
-        print(f"Current resolution: H:{original_height} x W:{original_width}")
+        # original_height = image.height
+        # original_width = image.width
+        # print(f"Current resolution: H:{original_height} x W:{original_width}")
 
-        # Pre-upscale image for tiling
-        resolution = 1024
-        hdr = 0.5
-        tile_gaussian_sigma = 0.3
-        max_tile_size = 1024 # or 1280
-        control_image = create_hdr_effect(image, hdr)
-        image = progressive_upscale(image, resolution)
-        image = create_hdr_effect(image, hdr)
+        # # Pre-upscale image for tiling
+        # resolution = 1024
+        # hdr = 0.5
+        # tile_gaussian_sigma = 0.3
+        # max_tile_size = 1024 # or 1280
+        # control_image = create_hdr_effect(image, hdr)
+        # image = progressive_upscale(image, resolution)
+        # image = create_hdr_effect(image, hdr)
 
-        # Update target height and width
-        target_height = resolution # image.height
-        target_width = resolution # image.width
+        # # Update target height and width
+        # target_height = resolution # image.height
+        # target_width = resolution # image.width
         
-        # Calculate overlap size
-        normal_tile_overlap, border_tile_overlap = self.pipe.calculate_overlap(target_width, target_height)
+        # # Calculate overlap size
+        # normal_tile_overlap, border_tile_overlap = self.pipe.calculate_overlap(target_width, target_height)
         
-        tile_weighting_method = self.pipe.TileWeightingMethod.COSINE.value
-        guidance_scale = 2.7
-        num_inference_steps = 50
-        denoising_strenght = 1.0
-        controlnet_strength = 0.435
-        prompt = "high-quality, noise-free edges, high quality"
-        negative_prompt = "blurry, pixelated, noisy, low resolution, artifacts, poor details"
+        # tile_weighting_method = self.pipe.TileWeightingMethod.COSINE.value
+        # guidance_scale = 2.7
+        # num_inference_steps = 50
+        # denoising_strenght = 1.0
+        # controlnet_strength = 0.435
+        # prompt = "high-quality, noise-free edges, high quality"
+        # negative_prompt = "blurry, pixelated, noisy, low resolution, artifacts, poor details"
 
-        # Image generation
-        sd_image_output = self.pipe(
-            image=control_image,
-            control_image=image,
-            control_mode=[6],
-            controlnet_conditioning_scale=float(controlnet_strength),
-            prompt=prompt,
-            negative_prompt=negative_prompt,
-            normal_tile_overlap=normal_tile_overlap,
-            border_tile_overlap=border_tile_overlap,
-            height=target_height,
-            width=target_width,
-            original_size=(original_width, original_height),
-            target_size=(target_width, target_height),
-            guidance_scale=guidance_scale,        
-            strength=float(denoising_strenght),
-            tile_weighting_method=tile_weighting_method,
-            max_tile_size=max_tile_size,
-            tile_gaussian_sigma=float(tile_gaussian_sigma),
-            num_inference_steps=num_inference_steps,
-        )["images"][0]
-        sd_image_output
+        # # Image generation
+        # sd_image_output = self.pipe(
+        #     image=control_image,
+        #     control_image=image,
+        #     control_mode=[6],
+        #     controlnet_conditioning_scale=float(controlnet_strength),
+        #     prompt=prompt,
+        #     negative_prompt=negative_prompt,
+        #     normal_tile_overlap=normal_tile_overlap,
+        #     border_tile_overlap=border_tile_overlap,
+        #     height=target_height,
+        #     width=target_width,
+        #     original_size=(original_width, original_height),
+        #     target_size=(target_width, target_height),
+        #     guidance_scale=guidance_scale,        
+        #     strength=float(denoising_strenght),
+        #     tile_weighting_method=tile_weighting_method,
+        #     max_tile_size=max_tile_size,
+        #     tile_gaussian_sigma=float(tile_gaussian_sigma),
+        #     num_inference_steps=num_inference_steps,
+        # )["images"][0]
+        # display(sd_image_output)
         
         # Converte PIL.Image para numpy array
-        img_array = np.array(sd_image_output)
+        img_array = np.array(image)
         
         # Realiza o upscaling
         upscaled_array, _ = self.upsampler.enhance(
