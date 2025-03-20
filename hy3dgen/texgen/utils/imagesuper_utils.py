@@ -79,7 +79,7 @@ class Image_Super_Net():
             torch_dtype=torch.float16, 
             use_safetensors=True, 
             variant="fp16"
-        ).to("cuda")
+        ).to(self.device)
 
         self.pipe.enable_model_cpu_offload()
         self.pipe.enable_vae_tiling()
@@ -159,6 +159,7 @@ class Image_Super_Net():
             tile_gaussian_sigma=float(tile_gaussian_sigma),
             num_inference_steps=num_inference_steps,
         )["images"][0]
+        sd_image_output
         
         # Converte PIL.Image para numpy array
         img_array = np.array(sd_image_output)
