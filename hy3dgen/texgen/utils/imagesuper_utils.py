@@ -42,15 +42,6 @@ new_content = content.replace(
 with codecs.open(file_path, "w", "utf-8") as f:
     f.write(new_content)
 print("Successfully!")
-%cd /kaggle/working/Hunyuan3D-2GP/mod-control-tile-upscaler-sdxl
-from pipeline.mod_controlnet_tile_sr_sdxl import StableDiffusionXLControlNetTileSRPipeline
-from pipeline.util import (
-    create_hdr_effect,
-    progressive_upscale,
-    quantize_8bit,
-    select_scheduler,
-)
-%cd /kaggle/working/Hunyuan3D-2GP
 
 import torch
 from PIL import Image
@@ -61,8 +52,13 @@ from IPython.display import display
 from diffusers import ControlNetUnionModel, AutoencoderKL, UNet2DConditionModel
 from diffusers import DDIMScheduler, EulerAncestralDiscreteScheduler
 from diffusers.utils import load_image
-from skimage import io
-from skimage.transform import resize
+from pipeline.mod_controlnet_tile_sr_sdxl import StableDiffusionXLControlNetTileSRPipeline
+from pipeline.util import (
+    create_hdr_effect,
+    progressive_upscale,
+    quantize_8bit,
+    select_scheduler,
+)
 
 from basicsr.archs.rrdbnet_arch import RRDBNet
 from realesrgan import RealESRGANer
