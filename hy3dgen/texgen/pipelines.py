@@ -209,7 +209,7 @@ class Hunyuan3DPaintPipeline:
         multiviews = self.models['multiview_model'](image_prompt, normal_maps + position_maps, camera_info)
 
         for i in range(len(multiviews)):
-            multiviews[i] = self.models['super_model'](view=multiviews[i], image=image_prompt)
+            #multiviews[i] = self.models['super_model'](view=multiviews[i], image=image_prompt)
             multiviews[i] = multiviews[i].resize(
                 (self.config.render_size, self.config.render_size))
 
