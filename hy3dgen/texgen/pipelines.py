@@ -209,7 +209,7 @@ class Hunyuan3DPaintPipeline:
         multiviews = self.models['multiview_model'](image_prompt, normal_maps + position_maps, camera_info)
 
         for i in range(len(multiviews)):
-            #     multiviews[i] = self.models['super_model'](multiviews[i])
+            multiviews[i] = self.models['super_model'](view=multiviews[i], image=image_prompt)
             multiviews[i] = multiviews[i].resize(
                 (self.config.render_size, self.config.render_size))
 
@@ -218,7 +218,8 @@ class Hunyuan3DPaintPipeline:
                                                  method=self.config.merge_method)
 
         mask_np = (mask.squeeze(-1).cpu().numpy() * 255).astype(np.uint8)
-
+        
+        print("Rendering maseh to save!")
         texture = self.texture_inpaint(texture, mask_np)
 
         self.render.set_texture(texture)
